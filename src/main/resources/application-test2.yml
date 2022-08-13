@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      uri: "your-uri"
+      database: "employee_system"
+      auto-index-creation: true
+server:
+  port: 8900

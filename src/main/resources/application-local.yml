@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://admin:password@localhost"
+      port: 27017
+      database: "employee_system"
+      auto-index-creation: true
+server:
+  port: 8901
