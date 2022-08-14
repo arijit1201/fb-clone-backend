@@ -1,6 +1,7 @@
 package com.akagami.api.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,47 @@ public class EmployeeServiceImpl implements EmployeeService {
 						emp.getEmailId()))
 				.collect(Collectors.toList());
 
+	}
+
+	@Override
+	public boolean deleteEmployee(String id) {
+		try {
+			EmployeeEntity employee = repository.findById(id).get();
+			repository.delete(employee);
+			return true;
+		}
+		catch(Exception e)
+		{
+			log.info("No employee found with id: "+id);
+		}
+		return false;
+	}
+
+	@Override
+	public Employee getEmployee(String id) {
+		try {
+			EmployeeEntity employee = repository.findById(id).get();
+			return new Employee(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailId());
+		}
+		catch(Exception e)
+		{
+			log.info("No employee found with id: "+id);
+		}
+		return null;
+	}
+
+	@Override
+	public Employee updateEmployee(String id, Employee employee) {
+		try {
+			EmployeeEntity employeeEntity = new EmployeeEntity(id, employee.getFirstName(), employee.getLastName(), employee.getEmailId());
+			employeeEntity = repository.save(employeeEntity);
+			return new Employee(employeeEntity.getId(), employeeEntity.getFirstName(), employeeEntity.getLastName(), employeeEntity.getEmailId());
+		}
+		catch(Exception e)
+		{
+			log.info("No employee found with id: "+id);
+		}
+		return null;
 	}
 
 }

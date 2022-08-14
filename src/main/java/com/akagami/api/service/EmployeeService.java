@@ -11,4 +11,10 @@ public interface EmployeeService {
 
 	List<Employee> getAllEmployees();
 
+	boolean deleteEmployee(String id);
+
+	Employee getEmployee(String id);
+
+	Employee updateEmployee(String id, Employee employee);
+
 }
