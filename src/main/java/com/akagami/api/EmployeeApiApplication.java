@@ -8,15 +8,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import com.akagami.api.entity.EmployeeEntity;
-import com.akagami.api.repositories.EmployeeRepository;
+import com.akagami.api.entity.PostEntity;
+import com.akagami.api.repositories.PostEntityRepository;
 
 @SpringBootApplication
 @EnableMongoRepositories(basePackages = "com.akagami.api.repositories")
 public class EmployeeApiApplication implements CommandLineRunner{
 
 	@Autowired
-	private EmployeeRepository repository;
+	private PostEntityRepository repository;
 	private static Logger log = Logger.getLogger(EmployeeApiApplication.class.getName());
 	public static void main(String[] args) {
 		SpringApplication.run(EmployeeApiApplication.class, args);
