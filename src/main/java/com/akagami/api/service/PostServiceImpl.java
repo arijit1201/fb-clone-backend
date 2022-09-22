@@ -1,13 +1,19 @@
 package com.akagami.api.service;
 
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.akagami.api.entity.PostEntity;
 import com.akagami.api.model.Post;
@@ -21,28 +27,32 @@ public class PostServiceImpl implements PostService {
 	private static final Logger log = Logger.getLogger(PostServiceImpl.class.getName());
 
 	@Override
-	public Post addPost(Post post) {
+	public PostEntity addPost(PostEntity postEntity) {
 		try {
-			PostEntity postEntity = new PostEntity();
-			BeanUtils.copyProperties(post, postEntity);
-			
-			if(post.getFile() != null && !post.getFile().equalsIgnoreCase("null"))
-			{
-				postEntity.setImage(post.getFile());
-			}
-			else postEntity.setImage(null);
-				
-			
+
+			postEntity.setTimeStamp(new Date().toString());
 			postEntity = repository.save(postEntity);
-			post.setId(postEntity.getId());
-			post.setFile(null);
-			post.setImage(postEntity.getImage());
 			log.info(postEntity.toString());
+			return postEntity;
+			
+			
 		} catch (Exception e) {
 			log.severe("Exception occured: " + e.getMessage());
-			return null;
+			
 		}
-		return post;
+		return null;
+	}
+
+	@Override
+	public List<PostEntity> getPosts() {
+		// TODO Auto-generated method stub
+		List<PostEntity> posts = repository.findAll();
+		posts.stream().forEach(post -> {
+			if(post.getImage()!=null)
+				Base64.getEncoder().encodeToString(post.getImage().getData());
+			
+		});
+		return posts;
 	}
 
 //	@Override

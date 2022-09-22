@@ -1,6 +1,9 @@
 package com.akagami.api.service;
 
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.akagami.api.entity.PostEntity;
 import com.akagami.api.model.Post;
@@ -17,6 +20,8 @@ public interface PostService {
 //
 //	Post updateEmployee(String id, Post employee);
 
-	Post addPost(Post post);
+	PostEntity addPost(PostEntity post);
+
+	List<PostEntity> getPosts();
 
 }

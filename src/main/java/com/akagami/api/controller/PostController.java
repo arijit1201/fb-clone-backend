@@ -1,10 +1,14 @@
 package com.akagami.api.controller;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,32 +26,85 @@ import org.springframework.web.multipart.MultipartFile;
 import com.akagami.api.entity.PostEntity;
 import com.akagami.api.model.Post;
 import com.akagami.api.service.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/post")
+@RequestMapping(value="/api/v1/post", consumes="multipart/form-data")
 public class PostController {
 	
 	@Autowired
 	private PostService service;
 	
 	@PostMapping
-	public Post addPost(@RequestBody Map<String, String> requestParams, @RequestParam MultipartFile file, @RequestParam MultipartFile profilePic) {
-		String strPost = requestParams.get("post");
-		String email = requestParams.get("email");
-		String name = requestParams.get("name");
+	public PostEntity addPost( @RequestParam(value = "image", required = false) MultipartFile image, @RequestParam(value="profile", required=false) MultipartFile profilePic,  @RequestParam("data") String data) throws IOException {
+		String jsonString 
+        = new ObjectMapper().readTree(data).asText("");
+		JsonNode node = new ObjectMapper().readTree(jsonString);
+		String strPost = node.get("post").asText();
+		String email = node.get("email").asText();
+		String name = node.get("name").asText();
+		
+		PostEntity post = PostEntity.builder()
+				.email(email)
+				.post(strPost)
+				.name(name)
+				.build()
+				;
+		System.out.println(image);
+		if(image!=null && image.getSize()>0)
+			post.setImage((new Binary(BsonBinarySubType.BINARY,image.getBytes())));
+		else post.setImage(null);
+//		if(profilePic!=null && profilePic.getSize()>0)
+//			post.setProfilePic(new Binary(BsonBinarySubType.BINARY,profilePic.getBytes()));
+//		else post.setProfilePic(null);
 //		MultipartFile file = requestParams.get("file");
 //		MultipartFile profilePic = requestParams.get("profilePic");
-		System.out.println("sd");
-		Post post = new Post(strPost,);
-		post = service.addPost(post);
-		return post;
+		PostEntity result = service.addPost(post);
+		result.setImgRes(Base64.getEncoder().encodeToString(new Binary(BsonBinarySubType.BINARY,image.getBytes()).getData()));
+		result.setProfilePic(null);
+		return result;
 	}
 	
-//	@GetMapping("/employees")
-//	public List<Post> getAllEmployees(){
-//		return service.getAllEmployees();
-//	}
+	
+	@PostMapping("/v2")
+	public PostEntity addPost2( @RequestParam Map<String,String> requestParams) throws IOException {
+		requestParams.entrySet().stream().forEach(entry -> System.out.println("key : "+entry.getKey() + " value : "+ entry.getValue()));
+		String jsonString 
+        = new ObjectMapper().readTree(requestParams.get("data")).asText("");
+		JsonNode node = new ObjectMapper().readTree(jsonString);
+		String strPost = node.get("post").asText();
+		String email = node.get("email").asText();
+		String name = node.get("name").asText();
+		//System.out.print(requestParams.get("profile"));
+		PostEntity post = PostEntity.builder()
+				.email(email)
+				.post(strPost)
+				.name(name)
+				.build()
+				;
+//		System.out.println(image);
+//		if(image!=null && image.getSize()>0)
+//			post.setImage((new Binary(BsonBinarySubType.BINARY,image.getBytes())));
+//		else post.setImage(null);
+//		if(profilePic!=null && profilePic.getSize()>0)
+//			post.setProfilePic(new Binary(BsonBinarySubType.BINARY,profilePic.getBytes()));
+//		else post.setProfilePic(null);
+//		MultipartFile file = requestParams.get("file");
+//		MultipartFile profilePic = requestParams.get("profilePic");
+		PostEntity result = new PostEntity(); //service.addPost(post);
+		result.setImage(null);
+		result.setProfilePic(null);
+		return result;
+	}
+	
+	@GetMapping
+	public List<PostEntity> getAllEmployees(){
+		return service.getPosts();
+	}
 //	
 //	@DeleteMapping("/employee/{id}")
 //	public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable String id)

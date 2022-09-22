@@ -4,5 +4,11 @@ spring:
       uri: "your-uri"
       database: "employee_system"
       auto-index-creation: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 256MB
+      max-request-size: 256MB
 server:
-  port: 8900
+  port: 8901
