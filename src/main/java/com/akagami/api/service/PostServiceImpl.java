@@ -1,6 +1,7 @@
 package com.akagami.api.service;
 
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +48,7 @@ public class PostServiceImpl implements PostService {
 	public List<PostEntity> getPosts() {
 		// TODO Auto-generated method stub
 		List<PostEntity> posts = repository.findAll();
-		posts.stream().forEach(post -> {
-			if(post.getImage()!=null)
-				Base64.getEncoder().encodeToString(post.getImage().getData());
-			
-		});
+		Collections.sort(posts, Collections.reverseOrder());
 		return posts;
 	}
 

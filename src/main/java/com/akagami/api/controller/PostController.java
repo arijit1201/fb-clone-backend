@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,68 +41,65 @@ public class PostController {
 	private PostService service;
 	
 	@PostMapping
-	public PostEntity addPost( @RequestParam(value = "image", required = false) MultipartFile image, @RequestParam(value="profile", required=false) MultipartFile profilePic,  @RequestParam("data") String data) throws IOException {
+	public PostEntity addPost( @RequestParam(value = "image", required = false) MultipartFile image, @RequestParam("data") String data) throws IOException {
 		String jsonString 
         = new ObjectMapper().readTree(data).asText("");
 		JsonNode node = new ObjectMapper().readTree(jsonString);
 		String strPost = node.get("post").asText();
 		String email = node.get("email").asText();
 		String name = node.get("name").asText();
+		String profilePic = node.get("profile").asText();
 		
 		PostEntity post = PostEntity.builder()
 				.email(email)
 				.post(strPost)
 				.name(name)
+				.profilePic(profilePic)
 				.build()
 				;
 		System.out.println(image);
 		if(image!=null && image.getSize()>0)
 			post.setImage((new Binary(BsonBinarySubType.BINARY,image.getBytes())));
 		else post.setImage(null);
-//		if(profilePic!=null && profilePic.getSize()>0)
-//			post.setProfilePic(new Binary(BsonBinarySubType.BINARY,profilePic.getBytes()));
-//		else post.setProfilePic(null);
-//		MultipartFile file = requestParams.get("file");
-//		MultipartFile profilePic = requestParams.get("profilePic");
+		
 		PostEntity result = service.addPost(post);
-		result.setImgRes(Base64.getEncoder().encodeToString(new Binary(BsonBinarySubType.BINARY,image.getBytes()).getData()));
-		result.setProfilePic(null);
+		//result.setImgRes(Base64.getEncoder().encodeToString(new Binary(BsonBinarySubType.BINARY,image.getBytes()).getData()));
 		return result;
 	}
 	
 	
-	@PostMapping("/v2")
-	public PostEntity addPost2( @RequestParam Map<String,String> requestParams) throws IOException {
-		requestParams.entrySet().stream().forEach(entry -> System.out.println("key : "+entry.getKey() + " value : "+ entry.getValue()));
-		String jsonString 
-        = new ObjectMapper().readTree(requestParams.get("data")).asText("");
-		JsonNode node = new ObjectMapper().readTree(jsonString);
-		String strPost = node.get("post").asText();
-		String email = node.get("email").asText();
-		String name = node.get("name").asText();
-		//System.out.print(requestParams.get("profile"));
-		PostEntity post = PostEntity.builder()
-				.email(email)
-				.post(strPost)
-				.name(name)
-				.build()
-				;
-//		System.out.println(image);
-//		if(image!=null && image.getSize()>0)
-//			post.setImage((new Binary(BsonBinarySubType.BINARY,image.getBytes())));
-//		else post.setImage(null);
-//		if(profilePic!=null && profilePic.getSize()>0)
-//			post.setProfilePic(new Binary(BsonBinarySubType.BINARY,profilePic.getBytes()));
-//		else post.setProfilePic(null);
-//		MultipartFile file = requestParams.get("file");
-//		MultipartFile profilePic = requestParams.get("profilePic");
-		PostEntity result = new PostEntity(); //service.addPost(post);
-		result.setImage(null);
-		result.setProfilePic(null);
-		return result;
-	}
+//	@PostMapping("/v2")
+//	public PostEntity addPost2( @RequestParam Map<String,String> requestParams) throws IOException {
+//		requestParams.entrySet().stream().forEach(entry -> System.out.println("key : "+entry.getKey() + " value : "+ entry.getValue()));
+//		String jsonString 
+//        = new ObjectMapper().readTree(requestParams.get("data")).asText("");
+//		JsonNode node = new ObjectMapper().readTree(jsonString);
+//		String strPost = node.get("post").asText();
+//		String email = node.get("email").asText();
+//		String name = node.get("name").asText();
+//		//System.out.print(requestParams.get("profile"));
+//		PostEntity post = PostEntity.builder()
+//				.email(email)
+//				.post(strPost)
+//				.name(name)
+//				.build()
+//				;
+////		System.out.println(image);
+////		if(image!=null && image.getSize()>0)
+////			post.setImage((new Binary(BsonBinarySubType.BINARY,image.getBytes())));
+////		else post.setImage(null);
+////		if(profilePic!=null && profilePic.getSize()>0)
+////			post.setProfilePic(new Binary(BsonBinarySubType.BINARY,profilePic.getBytes()));
+////		else post.setProfilePic(null);
+////		MultipartFile file = requestParams.get("file");
+////		MultipartFile profilePic = requestParams.get("profilePic");
+//		PostEntity result = new PostEntity(); //service.addPost(post);
+//		result.setImage(null);
+//		result.setProfilePic(null);
+//		return result;
+//	}
 	
-	@GetMapping
+	@GetMapping(consumes = MediaType.ALL_VALUE)
 	public List<PostEntity> getAllEmployees(){
 		return service.getPosts();
 	}

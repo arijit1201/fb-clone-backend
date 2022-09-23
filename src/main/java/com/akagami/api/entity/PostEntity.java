@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
-public class PostEntity implements Serializable{
+public class PostEntity implements Serializable, Comparable<PostEntity>{
 	/**
 	 * 
 	 */
@@ -32,7 +32,12 @@ public class PostEntity implements Serializable{
 	private String name;
 	private String email;
 	private Binary image;
-	private Binary profilePic;
+	private String profilePic;
 	private String timeStamp;
 	private String imgRes;
+	@Override
+	public int compareTo(PostEntity o) {
+		// TODO Auto-generated method stub
+		return getTimeStamp().compareTo(o.getTimeStamp());
+	}
 }
